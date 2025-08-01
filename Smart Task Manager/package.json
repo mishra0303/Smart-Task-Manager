@@ -1,0 +1,18 @@
+{
+  "name": "smart-task-manager",
+  "version": "1.0.0",
+  "description": "Smart Task Manager with voice recognition",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "npx http-server frontend -p 8000 -c-1",
+    "server": "node server.js",
+    "test-voice": "echo 'Open http://localhost:8000/voice-simple.html to test voice recognition'"
+  },
+  "keywords": ["task-manager", "voice-recognition", "local-storage"],
+  "author": "",
+  "license": "MIT",
+  "devDependencies": {
+    "http-server": "^14.1.1"
+  }
+} 

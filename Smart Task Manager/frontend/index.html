@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Smart Task Manager</title>
+    <link rel="stylesheet" href="css/style.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+</head>
+<body>
+    <div id="voice-listening-indicator" style="display:none; position:fixed; top:20px; left:50%; transform:translateX(-50%); background:#007bff; color:white; padding:0.75rem 2rem; border-radius:2rem; font-size:1.2rem; z-index:3000; box-shadow:0 4px 12px rgba(0,0,0,0.15);">
+        <i class="fas fa-microphone"></i> Listening...
+    </div>
+    <audio id="voice-beep" preload="auto"></audio>
+    <div id="app">
+        <!-- Authentication Section -->
+        <div id="auth-section" class="auth-container">
+            <div class="auth-card">
+                <div class="auth-header">
+                    <h1><i class="fas fa-tasks"></i> Smart Task Manager</h1>
+                    <p>Organize your life, one task at a time</p>
+                </div>
+                
+                <!-- Login Form -->
+                <form id="login-form" class="auth-form">
+                    <h2>Welcome Back</h2>
+                    <div class="form-group">
+                        <label for="login-username">Username</label>
+                        <input type="text" id="login-username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="login-password">Password</label>
+                        <input type="password" id="login-password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Login</button>
+                    <p class="auth-switch">Don't have an account? <a href="#" id="show-register">Register</a></p>
+                </form>
+                <!-- Register Form -->
+                <form id="register-form" class="auth-form hidden">
+                    <h2>Create Account</h2>
+                    <div class="form-group">
+                        <label for="register-fullname">Full Name</label>
+                        <input type="text" id="register-fullname" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-username">Username</label>
+                        <input type="text" id="register-username" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-email">Email</label>
+                        <input type="email" id="register-email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="register-password">Password</label>
+                        <input type="password" id="register-password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary">Register</button>
+                    <p class="auth-switch">Already have an account? <a href="#" id="show-login">Login</a></p>
+                </form>
+            </div>
+        </div>
+
+        <!-- Main Application Section -->
+        <div id="main-section" class="main-container hidden">
+            <!-- Header -->
+            <header class="app-header">
+                <div class="header-left">
+                    <h1><i class="fas fa-tasks"></i> Smart Task Manager</h1>
+                </div>
+                <div class="header-right">
+                    <div class="user-info">
+                        <span id="user-name">User</span>
+                        <button id="logout-btn" class="btn btn-outline">Logout</button>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Main Content -->
+            <div class="main-content">
+                <!-- Sidebar -->
+                <aside class="sidebar">
+                    <nav class="sidebar-nav">
+                        <button class="nav-item active" data-view="dashboard">
+                            <i class="fas fa-home"></i>
+                            <span>Dashboard</span>
+                        </button>
+                        <button class="nav-item" data-view="tasks">
+                            <i class="fas fa-list"></i>
+                            <span>All Tasks</span>
+                        </button>
+                        <button class="nav-item" data-view="create">
+                            <i class="fas fa-plus"></i>
+                            <span>Create Task</span>
+                        </button>
+                        <button class="nav-item" data-view="categories">
+                            <i class="fas fa-tags"></i>
+                            <span>Categories</span>
+                        </button>
+                        <button class="nav-item" data-view="profile">
+                            <i class="fas fa-user"></i>
+                            <span>Profile</span>
+                        </button>
+                    </nav>
+                </aside>
+
+                <!-- Content Area -->
+                <main class="content">
+                    <!-- Dashboard View -->
+                    <div id="dashboard-view" class="view active">
+                        <div class="view-header">
+                            <h2>Dashboard</h2>
+                            <p>Welcome back! Here's your task overview.</p>
+                        </div>
+                        
+                        <!-- Statistics Cards -->
+                        <div class="stats-grid">
+                            <div class="stat-card">
+                                <div class="stat-icon">
+                                    <i class="fas fa-tasks"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <h3 id="total-tasks">0</h3>
+                                    <p>Total Tasks</p>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon completed">
+                                    <i class="fas fa-check-circle"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <h3 id="completed-tasks">0</h3>
+                                    <p>Completed</p>
+                                </div>
+                            </div>
+                            <div class="stat-card">
+                                <div class="stat-icon pending">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <h3 id="pending-tasks">0</h3>
+                                    <p>Pending</p>
+                                </div>
+                            </div>
+                            <div class="stat-card overdue">
+                                <div class="stat-icon overdue">
+                                    <i class="fas fa-exclamation-triangle"></i>
+                                </div>
+                                <div class="stat-content">
+                                    <h3 id="overdue-tasks">0</h3>
+                                    <p>Overdue</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Streak Section -->
+                        <div id="streak-section" class="section">
+                            <h3>Streak</h3>
+                            <div id="streak-bar"></div>
+                        </div>
+
+                        <!-- Recent Tasks -->
+                        <div class="section">
+                            <h3>Recent Tasks</h3>
+                            <div id="recent-tasks" class="tasks-list">
+                                <!-- Tasks will be populated here -->
+                            </div>
+                        </div>
+
+                        <!-- Quick Actions -->
+                        <div class="section">
+                            <h3>Quick Actions</h3>
+                            <div class="quick-actions">
+                                <button class="btn btn-primary" onclick="showView('create')">
+                                    <i class="fas fa-plus"></i> Create New Task
+                                </button>
+                                <button class="btn btn-outline" onclick="showView('tasks')">
+                                    <i class="fas fa-list"></i> View All Tasks
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Tasks View -->
+                    <div id="tasks-view" class="view">
+                        <div class="view-header">
+                            <h2>All Tasks</h2>
+                            <div class="view-actions">
+                                <div class="search-box">
+                                    <input type="text" id="task-search" placeholder="Search tasks...">
+                                    <i class="fas fa-search"></i>
+                                </div>
+                                <select id="status-filter">
+                                    <option value="">All Status</option>
+                                    <option value="PENDING">Pending</option>
+                                    <option value="IN_PROGRESS">In Progress</option>
+                                    <option value="COMPLETED">Completed</option>
+                                </select>
+                                <select id="priority-filter">
+                                    <option value="">All Priority</option>
+                                    <option value="HIGH">High</option>
+                                    <option value="MEDIUM">Medium</option>
+                                    <option value="LOW">Low</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div id="tasks-container" class="tasks-container">
+                            <!-- Tasks will be populated here -->
+                        </div>
+                    </div>
+
+                    <!-- Create Task View -->
+                    <div id="create-view" class="view">
+                        <div class="view-header">
+                            <h2>Create New Task</h2>
+                        </div>
+                        
+                        <form id="create-task-form" class="task-form">
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="task-title">Task Title *</label>
+                                    <input type="text" id="task-title" required>
+                                </div>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="task-description">Description</label>
+                                    <div style="display: flex; gap: 0.5rem; align-items: flex-start;">
+                                        <textarea id="task-description" rows="3" style="flex: 1;"></textarea>
+                                        <button type="button" id="voice-description-btn" class="btn btn-outline" title="Voice Input" style="padding: 0.5rem; min-width: auto;">
+                                            <i class="fas fa-microphone"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="task-priority">Priority</label>
+                                    <select id="task-priority">
+                                        <option value="MEDIUM">Medium</option>
+                                        <option value="HIGH">High</option>
+                                        <option value="LOW">Low</option>
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <label for="task-category">Category</label>
+                                    <select id="task-category">
+                                        <option value="">No Category</option>
+                                    </select>
+                                </div>
+                            </div>
+                            
+                            <div class="form-row">
+                                <div class="form-group">
+                                    <label for="task-due-date">Due Date</label>
+                                    <input type="datetime-local" id="task-due-date">
+                                </div>
+                            </div>
+                            
+                            <div class="form-actions">
+                                <button type="button" class="btn btn-outline" onclick="showView('dashboard')">Cancel</button>
+                                <button type="submit" class="btn btn-primary">Create Task</button>
+                                <button type="button" id="voice-create-task-btn" class="btn btn-primary" style="margin-left: 1rem;"><i class="fas fa-microphone"></i> Voice Create Task</button>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Categories View -->
+                    <div id="categories-view" class="view">
+                        <div class="view-header">
+                            <h2>Categories</h2>
+                            <button class="btn btn-primary" onclick="showAddCategoryModal()">
+                                <i class="fas fa-plus"></i> Add Category
+                            </button>
+                        </div>
+                        
+                        <div id="categories-container" class="categories-grid">
+                            <!-- Categories will be populated here -->
+                        </div>
+                    </div>
+
+                    <!-- Profile View -->
+                    <div id="profile-view" class="view">
+                        <div class="view-header">
+                            <h2>Profile Settings</h2>
+                        </div>
+                        
+                        <form id="profile-form" class="profile-form">
+                            <div class="form-group">
+                                <label for="profile-fullname">Full Name</label>
+                                <input type="text" id="profile-fullname" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="profile-email">Email</label>
+                                <input type="email" id="profile-email" required>
+                            </div>
+                            
+                            <div class="form-group">
+                                <label for="profile-username">Username</label>
+                                <input type="text" id="profile-username" readonly>
+                            </div>
+                            
+                            <button type="submit" class="btn btn-primary">Update Profile</button>
+                        </form>
+                        
+                        <div class="section">
+                            <h3>Change Password</h3>
+                            <form id="password-form" class="password-form">
+                                <div class="form-group">
+                                    <label for="current-password">Current Password</label>
+                                    <input type="password" id="current-password" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="new-password">New Password</label>
+                                    <input type="password" id="new-password" required>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="confirm-password">Confirm Password</label>
+                                    <input type="password" id="confirm-password" required>
+                                </div>
+                                
+                                <button type="submit" class="btn btn-primary">Change Password</button>
+                            </form>
+                        </div>
+                    </div>
+                </main>
+            </div>
+        </div>
+
+        <!-- Modals -->
+        <div id="modal-overlay" class="modal-overlay hidden">
+            <div class="modal">
+                <div class="modal-header">
+                    <h3 id="modal-title">Modal Title</h3>
+                    <button class="modal-close" onclick="closeModal()">
+                        <i class="fas fa-times"></i>
+                    </button>
+                </div>
+                <div class="modal-body" id="modal-body">
+                    <!-- Modal content will be populated here -->
+                </div>
+            </div>
+        </div>
+        <button id="global-voice-btn" title="Voice Command" style="position: fixed; bottom: 30px; right: 30px; z-index: 2000; background: #007bff; color: white; border: none; border-radius: 50%; width: 60px; height: 60px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: flex; align-items: center; justify-content: center; font-size: 2rem; cursor: pointer;">
+            <i class="fas fa-microphone"></i>
+        </button>
+        <button id="voice-help-btn" title="Voice Commands Help" style="position: fixed; bottom: 30px; right: 100px; z-index: 2000; background: #28a745; color: white; border: none; border-radius: 50%; width: 50px; height: 50px; box-shadow: 0 4px 12px rgba(0,0,0,0.15); display: flex; align-items: center; justify-content: center; font-size: 1.5rem; cursor: pointer;">
+            <i class="fas fa-question"></i>
+        </button>
+    </div>
+
+    <script src="js/app.js"></script>
+    <script>
+    // Set min date for due date input to today (prevents selecting past dates)
+    window.addEventListener('DOMContentLoaded', function() {
+        var dueDateInput = document.getElementById('task-due-date');
+        if (dueDateInput) {
+            var now = new Date();
+            // Format as yyyy-MM-ddTHH:mm
+            var pad = n => n < 10 ? '0' + n : n;
+            var local = now.getFullYear() + '-' + pad(now.getMonth()+1) + '-' + pad(now.getDate()) + 'T' + pad(now.getHours()) + ':' + pad(now.getMinutes());
+            dueDateInput.min = local;
+        }
+    });
+    </script>
+</body>
+</html> 
